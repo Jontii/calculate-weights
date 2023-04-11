@@ -2,9 +2,9 @@ import { Box, Button, Checkbox, Container, Grid, NumberInput, Space, Title } fro
 import { useState } from "react"
 import "./App.css"
 
-export const App = () => {
+const App = () => {
   const [weight, setWeight] = useState<number | "">()
-  const [percent, setPercent] = useState<number | "">(50)
+  const [percent, setPercent] = useState<number | "">(100)
 
   const [selected, setSelected] = useState<number[]>([])
   const [calculated, setCalculated] = useState<number[]>([])
@@ -26,7 +26,7 @@ export const App = () => {
     setSelected((oldValues) => [...new Set([...oldValues, value])])
   }
 
-  console.log(calculated)
+  console.log(33 % 1)
 
   return (
     <Container h="100%" px="xl" py="xl" sx={{ boxSizing: "border-box" }}>
@@ -53,7 +53,9 @@ export const App = () => {
           />
           <Space h="md" />
 
-          <Title order={1}>Weight %</Title>
+          <Title order={1} pb="sm">
+            Weight %
+          </Title>
           <NumberInput
             variant="default"
             min={0}
@@ -92,13 +94,31 @@ export const App = () => {
           </Box>
         </Box>
 
-        <Title order={3}>Your sets here:</Title>
-        <Box display="flex" sx={{ flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+        <Title order={3} mb="md" mt="md">
+          Sets:
+        </Title>
+        <Box
+          display="flex"
+          sx={{
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 8,
+            rowGap: 20,
+          }}
+        >
           {calculated.sort().map((c) => (
-            <Checkbox size="lg" key={c} label={c.toPrecision(4) + " kg"} />
+            <Checkbox
+              w="90px"
+              size="lg"
+              key={c}
+              label={c % 1 === 0 ? c.toPrecision(2) : c.toPrecision(4)}
+            />
           ))}
         </Box>
       </Box>
     </Container>
   )
 }
+
+export default App
