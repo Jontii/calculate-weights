@@ -102,9 +102,9 @@ const App = () => {
           sx={{
             flexWrap: "wrap",
             alignItems: "center",
-            justifyContent: "space-between",
             gap: 8,
             rowGap: 20,
+            marginBottom: "10",
           }}
         >
           {calculated.sort().map((c) => (
@@ -112,7 +112,7 @@ const App = () => {
               w="90px"
               size="lg"
               key={c}
-              label={c % 1 === 0 ? c.toPrecision(2) : c.toPrecision(4)}
+              label={c % 1 === 0 ? c.toFixed(0) : c.toFixed(2)}
             />
           ))}
         </Box>
