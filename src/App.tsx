@@ -1,8 +1,18 @@
 import { Box, Button, Checkbox, Container, Grid, NumberInput, Space, Title } from "@mantine/core"
 import { useState } from "react"
 import "./App.css"
+import { useLocalStorage } from "./useLocalStorage"
 
 const App = () => {
+  const [previousWeight, setPreviousWeight] = useLocalStorage<number | "">(`weight`, "")
+  const [previousPercentage, setPreviousPercentage] = useLocalStorage<number | "">(
+    `percentage`,
+    100
+  )
+  const [previousCalculated, setPreviousCalculated] = useLocalStorage<number[] | undefined>(
+    `calculated`,
+    []
+  )
   const [weight, setWeight] = useState<number | "">()
   const [percent, setPercent] = useState<number | "">(100)
 
@@ -15,7 +25,9 @@ const App = () => {
       ? (weight as number) * finalPercent
       : parseInt(weight?.toString() || "0") * finalPercent
 
-    setCalculated(selected.map((s) => s * 0.01 * finalWeight))
+    const calculatedTemp = selected.map((s) => s * 0.01 * finalWeight)
+    setCalculated(calculatedTemp)
+    setPreviousCalculated(calculatedTemp)
   }
 
   const handleSetSelected = (value: number) => {
@@ -26,7 +38,11 @@ const App = () => {
     setSelected((oldValues) => [...new Set([...oldValues, value])])
   }
 
-  console.log(33 % 1)
+  const handleReusePreviousValues = () => {
+    setCalculated(previousCalculated || [])
+    setPercent(previousPercentage || 100)
+    setWeight(previousWeight)
+  }
 
   return (
     <Container h="100%" px="xl" py="xl" sx={{ boxSizing: "border-box" }}>
@@ -45,46 +61,61 @@ const App = () => {
           <NumberInput
             variant="default"
             placeholder="80 kg"
-            onChange={setWeight}
+            onChange={(value) => {
+              setWeight(value)
+              setPreviousWeight(value)
+            }}
             precision={2}
+            step={5}
             min={0}
             value={weight}
+            type="number"
             size="xl"
           />
           <Space h="md" />
 
           <Title order={1} pb="sm">
-            Weight %
+            % of weight
           </Title>
           <NumberInput
             variant="default"
             min={0}
             value={percent}
             placeholder="95%"
-            onChange={setPercent}
+            onChange={(value) => {
+              setPercent(value)
+              setPreviousPercentage(value)
+            }}
             step={5}
             size="xl"
+            type="number"
           />
         </Box>
         <Space h="md" />
         <Box>
           <Grid gutter={"sm"}>
-            {[10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100].map(
-              (value) => (
-                <Grid.Col span={3} key={value}>
-                  <Button
-                    variant={selected.find((v) => v === value) ? "filled" : "light"}
-                    onClick={() => handleSetSelected(value)}
-                  >
-                    {value}%
-                  </Button>
-                </Grid.Col>
-              )
-            )}
+            {[45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120].map((value) => (
+              <Grid.Col span={3} key={value}>
+                <Button
+                  variant={selected.find((v) => v === value) ? "filled" : "light"}
+                  onClick={() => handleSetSelected(value)}
+                >
+                  {value}%
+                </Button>
+              </Grid.Col>
+            ))}
           </Grid>
-          <Box mt="xl" w="100%">
+          <Box mt="xl" w="100%" display="flex" sx={{ gap: 10 }}>
             <Button
-              fullWidth
+              w="49%"
+              disabled={previousWeight === undefined || previousCalculated === undefined}
+              variant="filled"
+              onClick={handleReusePreviousValues}
+            >
+              Previous values
+            </Button>
+            <Button
+              w="49%"
               disabled={!weight || weight === 0}
               variant="filled"
               onClick={handleCalculate}
