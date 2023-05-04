@@ -13,6 +13,10 @@ const App = () => {
     `calculated`,
     []
   )
+  const [previouslySelected, setPreviouslySelected] = useLocalStorage<number[]>(
+    `selected`,
+    []
+  )
   const [weight, setWeight] = useState<number | "">()
   const [percent, setPercent] = useState<number | "">(100)
 
@@ -33,13 +37,16 @@ const App = () => {
   const handleSetSelected = (value: number) => {
     if (selected.includes(value)) {
       setSelected(selected.filter((v) => v !== value))
+      setPreviouslySelected(selected.filter((v) => v !== value))
       return
     }
     setSelected((oldValues) => [...new Set([...oldValues, value])])
+    setPreviouslySelected([...new Set([...selected, value])])
   }
 
   const handleReusePreviousValues = () => {
     setCalculated(previousCalculated || [])
+    setSelected(previouslySelected || [])
     setPercent(previousPercentage || 100)
     setWeight(previousWeight)
   }
